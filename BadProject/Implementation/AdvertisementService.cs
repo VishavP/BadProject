@@ -1,4 +1,5 @@
-﻿using BadProject.Services.Interfaces;
+﻿using BadProject.Interfaces;
+using BadProject.Services.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
@@ -11,14 +12,18 @@ namespace BadProject.Implementation
 {
     public class AdvertisementService : IAdvertisementService
     {
-        private MemoryCache cache = new MemoryCache(""); //inject this
-        private Queue<DateTime> errors = new Queue<DateTime>(); //inject this
         private static object lockObj; 
-        private NoSqlAdvProvider _NoSqlAdvProvider; 
+        private NoSqlAdvProvider _NoSqlAdvProvider;
+        private IErrorProvider _ErrorProvider;
+        private ICachingService _cachingService;
+        private int _maxRetryCount; 
 
-        public AdvertisementService(NoSqlAdvProvider noSqlAdvProvider)
+        public AdvertisementService(NoSqlAdvProvider noSqlAdvProvider, ICachingService cachingService, IErrorProvider errorProvider)
         {
             this._NoSqlAdvProvider = noSqlAdvProvider;
+            this._cachingService = cachingService;
+            this._ErrorProvider = errorProvider;
+            this._maxRetryCount = Convert.ToInt32(ConfigurationManager.AppSettings["RetryCount"]);
         }
         // **************************************************************************************************
         // Loads Advertisement information by id
@@ -41,16 +46,11 @@ namespace BadProject.Implementation
             lock (lockObj)
             {
                 // Use Cache if available
-                advertisement = (Advertisement)cache.Get($"AdvKey_{id}");
-
+                advertisement = _cachingService.GetAdvertisementFromCache(id);
                 // Count HTTP error timestamps in the last hour
-                while (errors.Count > 20)
-                {
-                    errors.Dequeue();
-                }
-                int errorCount = errors.Where(err=>err > DateTime.Now.AddHours(-1)).Count();
+                IEnumerable<DateTime> errors = _ErrorProvider.GetErrorsByMaxDate(DateTime.Now.AddHours(-1));
                 // If Cache is empty and ErrorCount<10 then use HTTP provider
-                if ((advertisement == null) && (errorCount < 10))
+                if ((advertisement == null) && (errors.Count() < 10))
                 {
                     int retry = 0;
                     do
@@ -63,17 +63,16 @@ namespace BadProject.Implementation
                         catch
                         {
                             Thread.Sleep(1000);
-                            errors.Enqueue(DateTime.Now); // Store HTTP error timestamp              
+                            _ErrorProvider.AddError(DateTime.Now); // Store HTTP error timestamp              
                         }
-                    } while ((advertisement == null) && (retry < int.Parse(ConfigurationManager.AppSettings["RetryCount"])));
+                    } while ((advertisement == null) && (retry < _maxRetryCount));
 
 
                     if (advertisement != null)
                     {
-                        cache.Set($"AdvKey_{id}", advertisement, DateTimeOffset.Now.AddMinutes(5));
+                        _cachingService.GetCachingMechanism().Set($"AdvKey_{id}", advertisement, DateTimeOffset.Now.AddMinutes(5));
                     }
                 }
-
 
                 // if needed try to use Backup provider
                 if (advertisement == null)
@@ -82,7 +81,7 @@ namespace BadProject.Implementation
 
                     if (advertisement != null)
                     {
-                        cache.Set($"AdvKey_{id}", advertisement, DateTimeOffset.Now.AddMinutes(5));
+                        _cachingService.GetCachingMechanism().Set($"AdvKey_{id}", advertisement, DateTimeOffset.Now.AddMinutes(5));
                     }
                 }
             }
