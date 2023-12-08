@@ -14,14 +14,14 @@ namespace BadProject.Implementation
     public class AdvertisementService : IAdvertisementService
     {
         private static object lockObj;
-        private NoSqlAdvProvider _NoSqlAdvProvider;
+        private NoSqlAdvProvider SqlProvider;
         private IErrorProvider _ErrorProvider;
         private ICachingService _cachingService;
         private int _maxRetryCount;
 
         public AdvertisementService(NoSqlAdvProvider noSqlAdvProvider, ICachingService cachingService, IErrorProvider errorProvider)
         {
-            this._NoSqlAdvProvider = noSqlAdvProvider;
+            this.SqlProvider = noSqlAdvProvider;
             this._cachingService = cachingService;
             this._ErrorProvider = errorProvider;
             this._maxRetryCount = Convert.ToInt32(ConfigurationManager.AppSettings["RetryCount"]);
@@ -48,7 +48,6 @@ namespace BadProject.Implementation
 
             // Use Cache if available
             advertisement = _cachingService.GetAdvertisementFromCache(id);
-            // Count HTTP error timestamps in the last hour
             IEnumerable<Error> errors = _ErrorProvider.GetErrorsByMinDate(DateTime.Now.AddHours(-1));
             // If Cache is empty and ErrorCount<10 then use HTTP provider
             if ((advertisement == null) && (errors.Count() < 10))
@@ -59,7 +58,7 @@ namespace BadProject.Implementation
                     retry++;
                     try
                     {
-                        advertisement = _NoSqlAdvProvider.GetAdv(id);
+                        advertisement = SqlProvider.GetAdv(id);
                     }
                     catch (Exception error)
                     {

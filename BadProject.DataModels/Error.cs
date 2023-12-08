@@ -9,8 +9,8 @@ namespace BadProject.DataModels
     public sealed class Error
     {
         public string Message { get; set; }
-        public DateTime DateTime { get; set; }
-        public Error(string Message, DateTime dateTime) 
+        public DateTimeOffset DateTime { get; set; }
+        public Error(string Message, DateTimeOffset dateTime) 
         {
             this.Message = Message;
             this.DateTime = dateTime;

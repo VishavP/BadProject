@@ -6,6 +6,7 @@ using ThirdParty;
 
 namespace BadProject.Tests.UnitTests
 {
+    [TestFixture]
     public class when_using_cache_layer
     {
         private CachingService _cachingService;

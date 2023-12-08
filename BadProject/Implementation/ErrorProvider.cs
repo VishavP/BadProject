@@ -29,5 +29,9 @@ namespace BadProject.Implementation
         {
             return _errors;
         }
+
+        public void ClearErrors() {
+            this._errors.Clear();
+        }
     }
 }
