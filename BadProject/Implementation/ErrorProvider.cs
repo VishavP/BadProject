@@ -10,7 +10,7 @@ namespace BadProject.Implementation
 {
     public class ErrorProvider : IErrorProvider
     {
-        private static Queue<Error> _errors = new Queue<Error>();
+        private Queue<Error> _errors = new Queue<Error>();
         public ErrorProvider()
         {
             _errors = new Queue<Error>();
