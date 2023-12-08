@@ -1,4 +1,4 @@
-﻿using BadProject.Models;
+﻿using ThirdParty;
 
 namespace BadProject.Services.Interfaces
 {

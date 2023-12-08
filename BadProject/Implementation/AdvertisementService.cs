@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Configuration;
+using System.Linq;
 using System.Runtime.Caching;
 using System.Threading;
 using ThirdParty;
@@ -10,9 +11,15 @@ namespace BadProject.Implementation
 {
     public class AdvertisementService : IAdvertisementService
     {
-        private static MemoryCache cache = new MemoryCache("");
-        private static Queue<DateTime> errors = new Queue<DateTime>();
-        private Object lockObj = new Object();
+        private MemoryCache cache = new MemoryCache(""); //inject this
+        private Queue<DateTime> errors = new Queue<DateTime>(); //inject this
+        private static object lockObj; 
+        private NoSqlAdvProvider _NoSqlAdvProvider; 
+
+        public AdvertisementService(NoSqlAdvProvider noSqlAdvProvider)
+        {
+            this._NoSqlAdvProvider = noSqlAdvProvider;
+        }
         // **************************************************************************************************
         // Loads Advertisement information by id
         // from cache or if not possible uses the "mainProvider" or if not possible uses the "backupProvider"
@@ -29,27 +36,21 @@ namespace BadProject.Implementation
         //    it uses the SqlDataProvider (backupProvider)
         public Advertisement GetAdvertisement(string id)
         {
-            Advertisement adv = null;
+            Advertisement advertisement = null;
 
             lock (lockObj)
             {
                 // Use Cache if available
-                adv = (Advertisement)cache.Get($"AdvKey_{id}");
+                advertisement = (Advertisement)cache.Get($"AdvKey_{id}");
 
                 // Count HTTP error timestamps in the last hour
-                while (errors.Count > 20) errors.Dequeue();
-                int errorCount = 0;
-                foreach (var dat in errors)
+                while (errors.Count > 20)
                 {
-                    if (dat > DateTime.Now.AddHours(-1))
-                    {
-                        errorCount++;
-                    }
+                    errors.Dequeue();
                 }
-
-
+                int errorCount = errors.Where(err=>err > DateTime.Now.AddHours(-1)).Count();
                 // If Cache is empty and ErrorCount<10 then use HTTP provider
-                if ((adv == null) && (errorCount < 10))
+                if ((advertisement == null) && (errorCount < 10))
                 {
                     int retry = 0;
                     do
@@ -57,36 +58,35 @@ namespace BadProject.Implementation
                         retry++;
                         try
                         {
-                            var dataProvider = new NoSqlAdvProvider();
-                            adv = dataProvider.GetAdv(id);
+                            advertisement = _NoSqlAdvProvider.GetAdv(id);
                         }
                         catch
                         {
                             Thread.Sleep(1000);
                             errors.Enqueue(DateTime.Now); // Store HTTP error timestamp              
                         }
-                    } while ((adv == null) && (retry < int.Parse(ConfigurationManager.AppSettings["RetryCount"])));
+                    } while ((advertisement == null) && (retry < int.Parse(ConfigurationManager.AppSettings["RetryCount"])));
 
 
-                    if (adv != null)
+                    if (advertisement != null)
                     {
-                        cache.Set($"AdvKey_{id}", adv, DateTimeOffset.Now.AddMinutes(5));
+                        cache.Set($"AdvKey_{id}", advertisement, DateTimeOffset.Now.AddMinutes(5));
                     }
                 }
 
 
                 // if needed try to use Backup provider
-                if (adv == null)
+                if (advertisement == null)
                 {
-                    adv = SQLAdvProvider.GetAdv(id);
+                    advertisement = SQLAdvProvider.GetAdv(id);
 
-                    if (adv != null)
+                    if (advertisement != null)
                     {
-                        cache.Set($"AdvKey_{id}", adv, DateTimeOffset.Now.AddMinutes(5));
+                        cache.Set($"AdvKey_{id}", advertisement, DateTimeOffset.Now.AddMinutes(5));
                     }
                 }
             }
-            return adv;
+            return advertisement;
         }
     }
 }
