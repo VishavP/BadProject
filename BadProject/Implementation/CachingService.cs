@@ -18,11 +18,12 @@ namespace BadProject.Implementation
         }
         public Advertisement GetAdvertisementFromCache(string id)
         {
-            return (Advertisement)_memoryCache.Get($"AdvKey_{id}");
+            return (Advertisement)GetCachingMechanism().Get($"AdvKey_{id}");
         }
 
-        public MemoryCache GetCachingMechanism() {
-            return _memoryCache;
+        public MemoryCache GetCachingMechanism() 
+        {
+            return this._memoryCache;
         }
     }
 }

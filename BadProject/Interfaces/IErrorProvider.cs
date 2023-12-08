@@ -1,4 +1,5 @@
-﻿using System;
+﻿using BadProject.DataModels;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,8 +9,8 @@ namespace BadProject.Interfaces
 {
     public interface IErrorProvider
     {
-        IEnumerable<DateTime> GetErrorsByMaxDate(DateTime maxDate);
-        Queue<DateTime> GetErrors();
-        void AddError(DateTime date);
+        IEnumerable<Error> GetErrorsByMinDate(DateTime minDate);
+        Queue<Error> GetErrors();
+        void AddError(Error error);
     }
 }

@@ -4,13 +4,14 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{9EE5AE59-357A-4A3F-A54A-2653EB7568E9}</ProjectGuid>
+    <ProjectGuid>{0E60B284-B241-42F6-9A0E-591E85F3AF25}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>BadProject</RootNamespace>
-    <AssemblyName>BadProject</AssemblyName>
+    <RootNamespace>BadProject.DataModels</RootNamespace>
+    <AssemblyName>BadProject.DataModels</AssemblyName>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
+    <Deterministic>true</Deterministic>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -31,9 +32,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
-    <Reference Include="System.configuration" />
     <Reference Include="System.Core" />
-    <Reference Include="System.Runtime.Caching" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -42,28 +41,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Implementation\AdvertisementService.cs" />
-    <Compile Include="Implementation\CachingService.cs" />
-    <Compile Include="Implementation\ErrorProvider.cs" />
-    <Compile Include="Interfaces\IAdvertisementService.cs" />
-    <Compile Include="Interfaces\ICachingService.cs" />
-    <Compile Include="Interfaces\IErrorProvider.cs" />
+    <Compile Include="Error.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\BadProject.DataModels\BadProject.DataModels.csproj">
-      <Project>{0E60B284-B241-42F6-9A0E-591E85F3AF25}</Project>
-      <Name>BadProject.DataModels</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\ThirdParty\ThirdParty.csproj">
-      <Project>{CFAA4807-37DD-47FB-9467-82CFDBBBFD16}</Project>
-      <Name>ThirdParty</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="App.config" />
-    <None Include="ToDo.txt" />
-  </ItemGroup>
-  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

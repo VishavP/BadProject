@@ -11,6 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BadProject.Tests", "BadProj
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BadProject.Services", "BadProject.Services\BadProject.Services.csproj", "{4D56D98F-DF5A-42E1-ADAC-6396BC75E6E6}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BadProject.DataModels", "BadProject.DataModels\BadProject.DataModels.csproj", "{0E60B284-B241-42F6-9A0E-591E85F3AF25}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,6 +35,10 @@ Global
 		{4D56D98F-DF5A-42E1-ADAC-6396BC75E6E6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4D56D98F-DF5A-42E1-ADAC-6396BC75E6E6}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4D56D98F-DF5A-42E1-ADAC-6396BC75E6E6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0E60B284-B241-42F6-9A0E-591E85F3AF25}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0E60B284-B241-42F6-9A0E-591E85F3AF25}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0E60B284-B241-42F6-9A0E-591E85F3AF25}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0E60B284-B241-42F6-9A0E-591E85F3AF25}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

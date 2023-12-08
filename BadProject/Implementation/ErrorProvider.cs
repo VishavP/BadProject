@@ -1,4 +1,5 @@
-﻿using BadProject.Interfaces;
+﻿using BadProject.DataModels;
+using BadProject.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,22 +10,22 @@ namespace BadProject.Implementation
 {
     public class ErrorProvider : IErrorProvider
     {
-        private static Queue<DateTime> _errors = new Queue<DateTime>();
+        private static Queue<Error> _errors = new Queue<Error>();
         public ErrorProvider()
         {
-            _errors = new Queue<DateTime>();
+            _errors = new Queue<Error>();
         }
-        public IEnumerable<DateTime> GetErrorsByMaxDate(DateTime maxDate)
+        public IEnumerable<Error> GetErrorsByMinDate(DateTime minDate)
         {
-            return _errors.Where(err => err > maxDate);
+            return _errors.Where(err => err.DateTime > minDate);
         }
 
-        public void AddError(DateTime date)
+        public void AddError(Error error)
         {
-            _errors.Enqueue(date);
+            _errors.Enqueue(error);
         }
 
-        public Queue<DateTime> GetErrors()
+        public Queue<Error> GetErrors()
         {
             return _errors;
         }

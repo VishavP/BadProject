@@ -1,4 +1,5 @@
-﻿using BadProject.Interfaces;
+﻿using BadProject.DataModels;
+using BadProject.Interfaces;
 using BadProject.Services.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -48,7 +49,7 @@ namespace BadProject.Implementation
                 // Use Cache if available
                 advertisement = _cachingService.GetAdvertisementFromCache(id);
                 // Count HTTP error timestamps in the last hour
-                IEnumerable<DateTime> errors = _ErrorProvider.GetErrorsByMaxDate(DateTime.Now.AddHours(-1));
+                IEnumerable<Error> errors = _ErrorProvider.GetErrorsByMinDate(DateTime.Now.AddHours(-1));
                 // If Cache is empty and ErrorCount<10 then use HTTP provider
                 if ((advertisement == null) && (errors.Count() < 10))
                 {
@@ -60,10 +61,10 @@ namespace BadProject.Implementation
                         {
                             advertisement = _NoSqlAdvProvider.GetAdv(id);
                         }
-                        catch
+                        catch(Exception err)
                         {
                             Thread.Sleep(1000);
-                            _ErrorProvider.AddError(DateTime.Now); // Store HTTP error timestamp              
+                            _ErrorProvider.AddError(new Error(err.Message, DateTime.Now));              
                         }
                     } while ((advertisement == null) && (retry < _maxRetryCount));
 
