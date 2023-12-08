@@ -13,11 +13,11 @@ namespace BadProject.Implementation
 {
     public class AdvertisementService : IAdvertisementService
     {
-        private static object lockObj; 
+        private static object lockObj;
         private NoSqlAdvProvider _NoSqlAdvProvider;
         private IErrorProvider _ErrorProvider;
         private ICachingService _cachingService;
-        private int _maxRetryCount; 
+        private int _maxRetryCount;
 
         public AdvertisementService(NoSqlAdvProvider noSqlAdvProvider, ICachingService cachingService, IErrorProvider errorProvider)
         {
@@ -44,46 +44,48 @@ namespace BadProject.Implementation
         {
             Advertisement advertisement = null;
 
-            lock (lockObj)
+            Monitor.Enter(lockObj);
+
+            // Use Cache if available
+            advertisement = _cachingService.GetAdvertisementFromCache(id);
+            // Count HTTP error timestamps in the last hour
+            IEnumerable<Error> errors = _ErrorProvider.GetErrorsByMinDate(DateTime.Now.AddHours(-1));
+            // If Cache is empty and ErrorCount<10 then use HTTP provider
+            if ((advertisement == null) && (errors.Count() < 10))
             {
-                // Use Cache if available
-                advertisement = _cachingService.GetAdvertisementFromCache(id);
-                // Count HTTP error timestamps in the last hour
-                IEnumerable<Error> errors = _ErrorProvider.GetErrorsByMinDate(DateTime.Now.AddHours(-1));
-                // If Cache is empty and ErrorCount<10 then use HTTP provider
-                if ((advertisement == null) && (errors.Count() < 10))
+                int retry = 0;
+                do
                 {
-                    int retry = 0;
-                    do
+                    retry++;
+                    try
                     {
-                        retry++;
-                        try
-                        {
-                            advertisement = _NoSqlAdvProvider.GetAdv(id);
-                        }
-                        catch(Exception err)
-                        {
-                            Thread.Sleep(1000);
-                            _ErrorProvider.AddError(new Error(err.Message, DateTime.Now));              
-                        }
-                    } while ((advertisement == null) && (retry < _maxRetryCount));
-
-
-                    if (advertisement != null)
-                    {
-                        _cachingService.GetCachingMechanism().Set($"AdvKey_{id}", advertisement, DateTimeOffset.Now.AddMinutes(5));
+                        advertisement = _NoSqlAdvProvider.GetAdv(id);
                     }
+                    catch (Exception error)
+                    {
+                        Thread.Sleep(1000);
+                        _ErrorProvider.AddError(new Error(error.Message, DateTime.Now));
+                    }
+                    finally
+                    {
+                        Monitor.Exit(lockObj);
+                    }
+                } while ((advertisement == null) && (retry < _maxRetryCount));
+
+
+                if (advertisement != null)
+                {
+                    _cachingService.GetCachingMechanism().Set($"AdvKey_{id}", advertisement, DateTimeOffset.Now.AddMinutes(5));
                 }
+            }
 
-                // if needed try to use Backup provider
-                if (advertisement == null)
+            // if needed try to use Backup provider
+            if (advertisement == null)
+            {
+                advertisement = SQLAdvProvider.GetAdv(id);
+                if (advertisement != null)
                 {
-                    advertisement = SQLAdvProvider.GetAdv(id);
-
-                    if (advertisement != null)
-                    {
-                        _cachingService.GetCachingMechanism().Set($"AdvKey_{id}", advertisement, DateTimeOffset.Now.AddMinutes(5));
-                    }
+                    _cachingService.SetCacheValue($"AdvKey_{id}", advertisement, DateTimeOffset.Now.AddMinutes(5));
                 }
             }
             return advertisement;

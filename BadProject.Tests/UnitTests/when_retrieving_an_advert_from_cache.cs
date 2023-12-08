@@ -22,5 +22,13 @@ namespace BadProject.Tests.UnitTests
         {
             Assert.DoesNotThrow(()=>_cachingService.Object.GetCachingMechanism());
         }
+
+        [Test]
+        public void it_should_return_the_object()
+        {
+            _cachingService.Object.SetCacheValue("key", new object{ }, DateTimeOffset.Now);
+            object o = _cachingService.Object.GetCachingMechanism().Get("key");
+            Assert.IsNotNull(o);
+        }
     }
 }

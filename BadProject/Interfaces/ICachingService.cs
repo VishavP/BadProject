@@ -12,6 +12,7 @@ namespace BadProject.Interfaces
     {
         Advertisement GetAdvertisementFromCache(string WebId);
         MemoryCache GetCachingMechanism();
+        void SetCacheValue(string key, object value, DateTimeOffset timeStamp);
 
 
     }

@@ -25,5 +25,10 @@ namespace BadProject.Implementation
         {
             return this._memoryCache;
         }
+
+        public void SetCacheValue(string key, object value, DateTimeOffset timeStamp)
+        {
+            this.GetCachingMechanism().Set($"AdvKey_{key}", value, timeStamp);
+        }
     }
 }
