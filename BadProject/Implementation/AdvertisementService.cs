@@ -46,9 +46,10 @@ namespace BadProject.Implementation
             Monitor.Enter(lockObj);
             advertisement = _cachingService.GetAdvertisementFromCache(id);
             IEnumerable<Error> errors = _ErrorProvider.GetErrorsByMinDate(DateTime.Now.AddHours(-1));
-            int retry = 0;
-            if ((advertisement == null && retry < _maxRetryCount) || (errors.Count() < 10 && retry < _maxRetryCount))
+            
+            if ((advertisement == null) || (errors.Count() < 10))
             {
+                int retry = 0;
                 do
                 {
                     try
