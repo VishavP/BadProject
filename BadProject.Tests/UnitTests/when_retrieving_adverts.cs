@@ -27,6 +27,13 @@ namespace BadProject.Tests.UnitTests
             Assert.IsNotNull(advertisement);
         }
 
+        [Test]
+        public void when_returning_advert_it_must_throw_an_exception_for_invalid_id()
+        {
+            var exception = Assert.Throws<Exception>(() => _advertisementService.GetAdvertisement(null));
+            Assert.That(exception.Message.Equals("Invalid id"));
+        }
+
         [TearDown]
         public void OnTearDown()
         {

@@ -42,48 +42,57 @@ namespace BadProject.Implementation
         //    it uses the SqlDataProvider (backupProvider)
         public Advertisement GetAdvertisement(string id)
         {
-            Advertisement advertisement = null;
-            Monitor.Enter(lockObj);
-            advertisement = _cachingService.GetAdvertisementFromCache(id);
-            IEnumerable<Error> errors = _ErrorProvider.GetErrorsByMinDate(DateTime.Now.AddHours(-1));
-            
-            if ((advertisement == null) || (errors.Count() < 10))
+            if (id != null)
             {
-                int retry = 0;
-                do
+                Advertisement advertisement = null;
+                Monitor.Enter(lockObj);
+                advertisement = _cachingService.GetAdvertisementFromCache(id);
+                IEnumerable<Error> errors = _ErrorProvider.GetErrorsByMinDate(DateTime.Now.AddHours(-1));
+
+                if ((advertisement == null) || (errors.Count() < 10))
                 {
-                    try
+                    int retry = 0;
+                    do
                     {
-                        retry++;
-                        advertisement = SqlProvider.GetAdv(id);
-                    }
-                    catch (Exception error)
-                    {
-                        Thread.Sleep(1000);
-                        _ErrorProvider.AddError(new Error(error.Message, DateTime.Now));
-                    }
-                    finally
-                    {
-                        Monitor.Exit(lockObj);
-                    }
-                } while ((advertisement == null));
+                        try
+                        {
+                            retry++;
+                            advertisement = SqlProvider.GetAdv(id);
+                        }
+                        catch (Exception error)
+                        {
+                            Thread.Sleep(1000);
+                            _ErrorProvider.AddError(new Error(error.Message, DateTime.Now));
+                        }
+                        finally
+                        {
+                            Monitor.Exit(lockObj);
+                        }
+                    } while ((advertisement == null));
 
 
-                if (advertisement != null)
-                {
-                    _cachingService.GetCachingMechanism().Set($"AdvKey_{id}", advertisement, DateTimeOffset.Now.AddMinutes(5));
+                    if (advertisement != null)
+                    {
+                        _cachingService.GetCachingMechanism().Set($"AdvKey_{id}", advertisement, DateTimeOffset.Now.AddMinutes(5));
+                    }
                 }
-            }
 
-            if (advertisement == null)
+                if (advertisement == null)
+                {
+                    advertisement = SQLAdvProvider.GetAdv(id);
+                    if (advertisement != null)
+                    {
+                        _cachingService.SetCacheValue($"AdvKey_{id}", advertisement, DateTimeOffset.Now.AddMinutes(5));
+                    }
+                }
+                return advertisement;
+            }
+            else
             {
-                advertisement = SQLAdvProvider.GetAdv(id);
-                if (advertisement != null)
-                {
-                    _cachingService.SetCacheValue($"AdvKey_{id}", advertisement, DateTimeOffset.Now.AddMinutes(5));
-                }
+                Error error = new Error("Invalid id", DateTimeOffset.Now);
+                _ErrorProvider.AddError(error);
+                throw new Exception(error.Message);
             }
-            return advertisement;
         }
     }
 }
