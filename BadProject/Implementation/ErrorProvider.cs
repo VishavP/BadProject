@@ -30,7 +30,8 @@ namespace BadProject.Implementation
             return _errors;
         }
 
-        public void ClearErrors() {
+        public void ClearErrors() 
+        {
             this._errors.Clear();
         }
     }

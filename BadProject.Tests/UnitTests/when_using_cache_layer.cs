@@ -1,9 +1,3 @@
-using BadProject.Implementation;
-using BadProject.Interfaces;
-using Moq;
-using System.Runtime.Caching;
-using ThirdParty;
-
 namespace BadProject.Tests.UnitTests
 {
     [TestFixture]

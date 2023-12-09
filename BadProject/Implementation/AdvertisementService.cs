@@ -13,7 +13,7 @@ namespace BadProject.Implementation
 {
     public class AdvertisementService : IAdvertisementService
     {
-        private static object lockObj;
+        private static readonly object lockObj = new object();
         private NoSqlAdvProvider SqlProvider;
         private IErrorProvider _ErrorProvider;
         private ICachingService _cachingService;
@@ -45,11 +45,8 @@ namespace BadProject.Implementation
             Advertisement advertisement = null;
 
             Monitor.Enter(lockObj);
-
-            // Use Cache if available
             advertisement = _cachingService.GetAdvertisementFromCache(id);
             IEnumerable<Error> errors = _ErrorProvider.GetErrorsByMinDate(DateTime.Now.AddHours(-1));
-            // If Cache is empty and ErrorCount<10 then use HTTP provider
             if ((advertisement == null) && (errors.Count() < 10))
             {
                 int retry = 0;
@@ -78,7 +75,6 @@ namespace BadProject.Implementation
                 }
             }
 
-            // if needed try to use Backup provider
             if (advertisement == null)
             {
                 advertisement = SQLAdvProvider.GetAdv(id);
