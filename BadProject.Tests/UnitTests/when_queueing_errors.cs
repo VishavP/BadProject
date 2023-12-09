@@ -8,7 +8,7 @@
         [SetUp]
         public void OnSetup()
         {
-            _errorProvider  = new ErrorProvider();
+            _errorProvider = new ErrorProvider();
         }
 
         [Test]
@@ -27,9 +27,16 @@
         }
 
         [Test]
+        public void when_retrieving_errors()
+        {
+            Queue<Error> results = null;
+            Assert.DoesNotThrow(() => results = _errorProvider.GetErrors());
+        }
+
+        [Test]
         public void when_clearing_errors()
         {
-            Assert.DoesNotThrow(()=>_errorProvider.ClearErrors());
+            Assert.DoesNotThrow(() => _errorProvider.ClearErrors());
         }
 
         [TearDown]

@@ -43,18 +43,17 @@ namespace BadProject.Implementation
         public Advertisement GetAdvertisement(string id)
         {
             Advertisement advertisement = null;
-
             Monitor.Enter(lockObj);
             advertisement = _cachingService.GetAdvertisementFromCache(id);
             IEnumerable<Error> errors = _ErrorProvider.GetErrorsByMinDate(DateTime.Now.AddHours(-1));
-            if ((advertisement == null) && (errors.Count() < 10))
+            int retry = 0;
+            if ((advertisement == null) && (errors.Count() < 10) && retry < _maxRetryCount)
             {
-                int retry = 0;
                 do
                 {
-                    retry++;
                     try
                     {
+                        retry++;
                         advertisement = SqlProvider.GetAdv(id);
                     }
                     catch (Exception error)
@@ -66,7 +65,7 @@ namespace BadProject.Implementation
                     {
                         Monitor.Exit(lockObj);
                     }
-                } while ((advertisement == null) && (retry < _maxRetryCount));
+                } while ((advertisement == null));
 
 
                 if (advertisement != null)
