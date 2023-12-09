@@ -1,4 +1,5 @@
 ﻿using BadProject.Services.Interfaces;
+using System;
 using System.Runtime.Caching;
 using ThirdParty;
 
@@ -18,6 +19,11 @@ namespace BadProject.Services.Implementation
 
         public MemoryCache GetCachingMechanism() {
             return _memoryCache;
+        }
+
+        public void SetCacheValue(object CacheValue, Advertisement advertisement, DateTimeOffset dateTimeOffset)
+        {
+            GetCachingMechanism().Set($"AdvKey_{CacheValue}", advertisement, DateTimeOffset.Now.AddMinutes(5));
         }
     }
 }

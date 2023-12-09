@@ -24,13 +24,13 @@ namespace BadProject.Tests.UnitTests
         [Test]
         public void it_should_set_the_object()
         {
-           Assert.DoesNotThrow(()=> _cachingService.SetCacheValue(id, new object{ }, DateTimeOffset.Now));
+           Assert.DoesNotThrow(()=> _cachingService.SetCacheValue(id, new Advertisement(), DateTimeOffset.Now));
         }
 
         [Test]
         public void it_should_get_the_object()
         {
-            _cachingService.SetCacheValue(id, new object { }, DateTimeOffset.Now);
+            _cachingService.SetCacheValue(id, new Advertisement(), DateTimeOffset.Now);
             Assert.DoesNotThrow(()=> _cachingService.GetAdvertisementFromCache(id));
         }
     }

@@ -1,4 +1,6 @@
-﻿namespace BadProject.Tests.UnitTests
+﻿
+
+namespace BadProject.Tests.UnitTests
 {
     [TestFixture]
     public class when_retrieving_adverts

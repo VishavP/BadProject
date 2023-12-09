@@ -11,15 +11,15 @@ using ThirdParty;
 
 namespace BadProject.Implementation
 {
-    public class AdvertisementService : IAdvertisementService
+    public class AdvertisementService 
     {
         private static readonly object lockObj = new object();
         private NoSqlAdvProvider SqlProvider;
         private IErrorProvider _ErrorProvider;
-        private ICachingService _cachingService;
+        private ICachingService<MemoryCache> _cachingService;
         private int _maxRetryCount;
 
-        public AdvertisementService(NoSqlAdvProvider noSqlAdvProvider, ICachingService cachingService, IErrorProvider errorProvider)
+        public AdvertisementService(NoSqlAdvProvider noSqlAdvProvider, ICachingService<MemoryCache> cachingService, IErrorProvider errorProvider)
         {
             this.SqlProvider = noSqlAdvProvider;
             this._cachingService = cachingService;

@@ -44,10 +44,16 @@
   <ItemGroup>
     <Compile Include="Class1.cs" />
     <Compile Include="Implementation\CachingService.cs" />
+    <Compile Include="Implementation\ErrorProvider.cs" />
     <Compile Include="Interfaces\ICachingService.cs" />
+    <Compile Include="Interfaces\IErrorProvider.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\BadProject.DataModels\BadProject.DataModels.csproj">
+      <Project>{0e60b284-b241-42f6-9a0e-591e85f3af25}</Project>
+      <Name>BadProject.DataModels</Name>
+    </ProjectReference>
     <ProjectReference Include="..\ThirdParty\ThirdParty.csproj">
       <Project>{CFAA4807-37DD-47FB-9467-82CFDBBBFD16}</Project>
       <Name>ThirdParty</Name>

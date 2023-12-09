@@ -43,17 +43,16 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Implementation\AdvertisementService.cs" />
-    <Compile Include="Implementation\CachingService.cs" />
-    <Compile Include="Implementation\ErrorProvider.cs" />
-    <Compile Include="Interfaces\IAdvertisementService.cs" />
-    <Compile Include="Interfaces\ICachingService.cs" />
-    <Compile Include="Interfaces\IErrorProvider.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\BadProject.DataModels\BadProject.DataModels.csproj">
       <Project>{0E60B284-B241-42F6-9A0E-591E85F3AF25}</Project>
       <Name>BadProject.DataModels</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\BadProject.Services\BadProject.Services.csproj">
+      <Project>{4D56D98F-DF5A-42E1-ADAC-6396BC75E6E6}</Project>
+      <Name>BadProject.Services</Name>
     </ProjectReference>
     <ProjectReference Include="..\ThirdParty\ThirdParty.csproj">
       <Project>{CFAA4807-37DD-47FB-9467-82CFDBBBFD16}</Project>
