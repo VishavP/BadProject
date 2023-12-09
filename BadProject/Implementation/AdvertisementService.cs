@@ -49,7 +49,7 @@ namespace BadProject.Implementation
                 advertisement = _cachingService.GetAdvertisementFromCache(id);
                 IEnumerable<Error> errors = _ErrorProvider.GetErrorsByMinDate(DateTime.Now.AddHours(-1));
 
-                if ((advertisement == null) || (errors.Count() < 10))
+                if ((advertisement == null) || (errors.Count() > 10))
                 {
                     int retry = 0;
                     do
