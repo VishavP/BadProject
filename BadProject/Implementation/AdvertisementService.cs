@@ -58,32 +58,29 @@ namespace BadProject.Implementation
                         {
                             retry++;
                             advertisement = SqlProvider.GetAdv(id);
+                            if (advertisement != null)
+                            {
+                                _cachingService.GetCachingMechanism().Set($"AdvKey_{id}", advertisement, DateTimeOffset.Now.AddMinutes(5));
+                            }
+                            else
+                            {
+                                advertisement = SQLAdvProvider.GetAdv(id);
+                                if (advertisement != null)
+                                {
+                                    _cachingService.SetCacheValue($"AdvKey_{id}", advertisement, DateTimeOffset.Now.AddMinutes(5));
+                                }
+                            }
                         }
                         catch (Exception error)
                         {
                             Thread.Sleep(1000);
-                            _ErrorProvider.AddError(new Error(error.Message, DateTime.Now));
+                            _ErrorProvider.AddError(new Error(error.Message, DateTime.Now)); //or rethrow it
                         }
                         finally
                         {
                             Monitor.Exit(lockObj);
                         }
                     } while ((advertisement == null));
-
-
-                    if (advertisement != null)
-                    {
-                        _cachingService.GetCachingMechanism().Set($"AdvKey_{id}", advertisement, DateTimeOffset.Now.AddMinutes(5));
-                    }
-                }
-
-                if (advertisement == null)
-                {
-                    advertisement = SQLAdvProvider.GetAdv(id);
-                    if (advertisement != null)
-                    {
-                        _cachingService.SetCacheValue($"AdvKey_{id}", advertisement, DateTimeOffset.Now.AddMinutes(5));
-                    }
                 }
                 return advertisement;
             }
