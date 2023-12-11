@@ -82,7 +82,6 @@ namespace BadProject.Implementation
                 Monitor.Exit(lockObj);
                 return advertisement;
             }
-
             else
             {
                 Error error = new Error("Invalid id", DateTimeOffset.Now);
