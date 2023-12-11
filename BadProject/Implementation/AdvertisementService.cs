@@ -86,7 +86,6 @@ namespace BadProject.Implementation
             {
                 Error error = new Error("Invalid id", DateTimeOffset.Now);
                 _ErrorProvider.AddError(error);
-                Monitor.Exit(lockObj);
                 throw new Exception(error.Message);
             }
         }
