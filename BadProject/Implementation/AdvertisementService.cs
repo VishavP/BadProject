@@ -77,10 +77,6 @@ namespace BadProject.Implementation
                             _ErrorProvider.AddError(new Error(error.Message, DateTime.Now)); //or rethrow it
                             Monitor.Exit(lockObj);
                         }
-                        finally
-                        {
-                            Monitor.Exit(lockObj);
-                        }
                     } while ((advertisement == null));
                 }
                 Monitor.Exit(lockObj);
