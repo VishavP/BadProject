@@ -75,6 +75,7 @@ namespace BadProject.Implementation
                         {
                             Thread.Sleep(1000);
                             _ErrorProvider.AddError(new Error(error.Message, DateTime.Now)); //or rethrow it
+                            Monitor.Exit(lockObj);
                         }
                         finally
                         {
@@ -82,12 +83,15 @@ namespace BadProject.Implementation
                         }
                     } while ((advertisement == null));
                 }
+                Monitor.Exit(lockObj);
                 return advertisement;
             }
+
             else
             {
                 Error error = new Error("Invalid id", DateTimeOffset.Now);
                 _ErrorProvider.AddError(error);
+                Monitor.Exit(lockObj);
                 throw new Exception(error.Message);
             }
         }
